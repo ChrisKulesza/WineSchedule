@@ -1,0 +1,10 @@
+C:\Dev\WineSchedule\WineScheduleWebApp\bin\Debug\netcoreapp1.1\WineScheduleWebApp.deps.json
+C:\Dev\WineSchedule\WineScheduleWebApp\bin\Debug\netcoreapp1.1\WineScheduleWebApp.runtimeconfig.json
+C:\Dev\WineSchedule\WineScheduleWebApp\bin\Debug\netcoreapp1.1\WineScheduleWebApp.runtimeconfig.dev.json
+C:\Dev\WineSchedule\WineScheduleWebApp\bin\Debug\netcoreapp1.1\WineScheduleWebApp.dll
+C:\Dev\WineSchedule\WineScheduleWebApp\bin\Debug\netcoreapp1.1\WineScheduleWebApp.pdb
+C:\Dev\WineSchedule\WineScheduleWebApp\obj\Debug\netcoreapp1.1\WineScheduleWebApp.csprojResolveAssemblyReference.cache
+C:\Dev\WineSchedule\WineScheduleWebApp\obj\Debug\netcoreapp1.1\UserSecretsAssemblyInfo.cs
+C:\Dev\WineSchedule\WineScheduleWebApp\obj\Debug\netcoreapp1.1\WineScheduleWebApp.AssemblyInfo.cs
+C:\Dev\WineSchedule\WineScheduleWebApp\obj\Debug\netcoreapp1.1\WineScheduleWebApp.dll
+C:\Dev\WineSchedule\WineScheduleWebApp\obj\Debug\netcoreapp1.1\WineScheduleWebApp.pdb
