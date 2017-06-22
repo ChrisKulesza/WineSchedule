@@ -6,9 +6,11 @@
 - git remote add origin https://github.com/andreasschild/WineSchedule.git
 - git push -u origin master
 - git push -u origin newfeature
+- git pull origin master
 
 -- touch commands.txt
 -- notepad commands.txt
 -- git branch
 -- git status
 -- git revert 7cebd44
+-- git log

@@ -26,7 +26,7 @@ namespace WineScheduleWebApp.Controllers.Api
         }
 
         // GET: Appellations/Details/5
-        public async Task<IActionResult> Details(string? id)
+        public async Task<IActionResult> Details(string id)
         {
             if (id == null)
             {
@@ -66,7 +66,7 @@ namespace WineScheduleWebApp.Controllers.Api
         }
 
         // GET: Appellations/Edit/5
-        public async Task<IActionResult> Edit(string? id)
+        public async Task<IActionResult> Edit(string id)
         {
             if (id == null)
             {
@@ -117,7 +117,7 @@ namespace WineScheduleWebApp.Controllers.Api
         }
 
         // GET: Appellations/Delete/5
-        public async Task<IActionResult> Delete(string? id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (id == null)
             {
