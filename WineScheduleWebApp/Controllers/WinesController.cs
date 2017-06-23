@@ -10,6 +10,8 @@ using WineScheduleWebApp.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using WineScheduleWebApp.Models.WineViewModels;
+using WineScheduleWebApp.HelperModels;
 
 namespace WineScheduleWebApp.Controllers
 {
@@ -31,6 +33,8 @@ namespace WineScheduleWebApp.Controllers
             var wines = await _context.Wine
                 .Include(w => w.Appellation)
                 .Include(w => w.Region)
+                .Include(w => w.Dryness)
+                .Include(w => w.Category)
                 .Include(w => w.WineGrapes)
                 .ToListAsync();
             return View(wines);
@@ -45,6 +49,11 @@ namespace WineScheduleWebApp.Controllers
             }
 
             var wine = await _context.Wine
+                .Include(w => w.Appellation)
+                .Include(w => w.Region)
+                .Include(w => w.Dryness)
+                .Include(w => w.Category)
+                .Include(w => w.WineGrapes)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (wine == null)
             {
@@ -59,8 +68,21 @@ namespace WineScheduleWebApp.Controllers
         // GET: Wines/Create
         public IActionResult Create()
         {
+            // Lists to choose
+            ViewBag.Appellations = new SelectList(_context.Appellation, "Id", "Name");
             ViewBag.Regions = new SelectList(_context.Region, "Id", "Name");
-            return View();
+            ViewBag.Drynesses = new SelectList(_context.Dryness, "Id", "Name");
+            ViewBag.Categories = new SelectList(_context.Category, "Id", "Name");
+
+            // Fill in the view model
+            var grapes = _context.Grape.ToList();
+            var createWineViewModel = new CreateWineViewModel();
+            for (int i = 0; i < grapes.Count(); i++)
+            {
+                // Fill out the check boxes to select the grapes
+                createWineViewModel.IdCheckBoxes.Add(new IdCheckBox() { Id = grapes[i].Id, Name = grapes[i].Name, IsSelected = false });
+            }
+            return View(createWineViewModel);
         }
 
         // POST: Wines/Create
@@ -68,17 +90,43 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Year,Price,Rating,Stock,ImagePath,Description,ApplicationUserId,CreationDate,LastModifiedDate")] Wine wine)
+        public async Task<IActionResult> Create(CreateWineViewModel viewModel)
         {
+
             if (ModelState.IsValid)
             {
+                
+                Wine wine = viewModel.Wine;
+
                 wine.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _context.Add(wine);
+
+                List<IdCheckBox> idCheckBoxes = viewModel.IdCheckBoxes;
+                foreach (var idCheckBox in idCheckBoxes)
+                {
+                    if(idCheckBox.IsSelected)
+                    {
+                        _context.Add(new WineGrape() { WineId = wine.Id, GrapeId = idCheckBox.Id });
+                    }
+                }
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", wine.RegionId);
-            return View(wine);
+
+            // Fill in the view model
+            var grapes = _context.Grape.ToList();
+            var createWineViewModel = new CreateWineViewModel();
+            for (int i = 0; i < grapes.Count(); i++)
+            {
+                // Fill out the check boxes to select the grapes
+                createWineViewModel.IdCheckBoxes.Add(new IdCheckBox() { Id = grapes[i].Id, Name = grapes[i].Name, IsSelected = false });
+            }
+
+            ViewBag.Appellations = new SelectList(_context.Appellation, "Id", "Name", viewModel.Wine.AppellationId);
+            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", viewModel.Wine.RegionId);
+            ViewBag.Drynesses = new SelectList(_context.Dryness, "Id", "Name", viewModel.Wine.DrynessId);
+            ViewBag.Categories = new SelectList(_context.Category, "Id", "Name", viewModel.Wine.CategoryId);
+            return View(viewModel);
         }
 
         // GET: Wines/InceaseStock/5
@@ -164,13 +212,30 @@ namespace WineScheduleWebApp.Controllers
                 return NotFound();
             }
 
-            var wine = await _context.Wine.SingleOrDefaultAsync(m => m.Id == id);
+            var wine = await _context.Wine
+                .Include(w => w.Appellation)
+                .Include(w => w.Region)
+                .Include(w => w.Dryness)
+                .Include(w => w.Category)
+                .Include(w => w.WineGrapes)
+                .SingleOrDefaultAsync(m => m.Id == id); 
             if (wine == null)
             {
                 return NotFound();
             }
+            var editWineViewModel = new EditWineViewModel();
+            editWineViewModel.Wine = wine;
+            var grapes = _context.Grape.ToList();
+            var wineGrapes = _context.WineGrape.Where(wg => wg.GrapeId == wine.Id).ToList();
+            editWineViewModel.IdCheckBoxes = GetEditCheckBoxes(grapes, wineGrapes);
+            
+
+            // Data to list
+            ViewBag.Appellations = new SelectList(_context.Appellation, "Id", "Name", wine.AppellationId);
             ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", wine.RegionId);
-            return View(wine);
+            ViewBag.Drynesses = new SelectList(_context.Dryness, "Id", "Name", wine.DrynessId);
+            ViewBag.Categories = new SelectList(_context.Category, "Id", "Name", wine.CategoryId);
+            return View(editWineViewModel);
         }
 
         // POST: Wines/Edit/5
@@ -178,15 +243,26 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Year,Price,Rating,Stock,ImagePath,Description,ApplicationUserId,CreationDate,LastModifiedDate")] Wine wine)
+        public async Task<IActionResult> Edit(string id, EditWineViewModel viewModel)
         {
-            if (id != wine.Id)
+            if (id != viewModel.Wine.Id)
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
+                Wine wine = viewModel.Wine;
+                // Add each Wine to Grape relationship to the database
+                List<IdCheckBox> idCheckBoxes = viewModel.IdCheckBoxes;
+                foreach (var idCheckBox in idCheckBoxes)
+                {
+                    if(idCheckBox.IsSelected)
+                    {
+                        WineGrape wineGrape = new WineGrape() { WineId = wine.Id, GrapeId = idCheckBox.Id };
+                        _context.Add(wineGrape);
+                    }
+                }
                 try
                 {
                     _context.Update(wine);
@@ -205,8 +281,11 @@ namespace WineScheduleWebApp.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", wine.RegionId);
-            return View(wine);
+            ViewBag.Appellations = new SelectList(_context.Appellation, "Id", "Name", viewModel.Wine.AppellationId);
+            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", viewModel.Wine.RegionId);
+            ViewBag.Drynesses = new SelectList(_context.Dryness, "Id", "Name", viewModel.Wine.DrynessId);
+            ViewBag.Categories = new SelectList(_context.Category, "Id", "Name", viewModel.Wine.CategoryId);
+            return View(viewModel);
         }
 
         // GET: Wines/Delete/5
@@ -241,6 +320,25 @@ namespace WineScheduleWebApp.Controllers
         private bool WineExists(string id)
         {
             return _context.Wine.Any(e => e.Id == id);
+        }
+        private List<IdCheckBox> GetEditCheckBoxes(List<Grape> grapes, List<WineGrape> wineGrapes)
+        {
+            var idCheckBoxes = new List<IdCheckBox>();
+            bool isSelected = false;
+            for (int i = 0; i < grapes.Count(); i++)
+            {
+                
+                for (int j = 0; j < wineGrapes.Count(); j++)
+                {
+                    if (grapes[i].Id == wineGrapes[i].GrapeId)
+                    {
+                        isSelected = true;
+                        break;
+                    }
+                }
+                idCheckBoxes.Add(new IdCheckBox() { Id = grapes[i].Id, Name = grapes[i].Name, IsSelected = isSelected });
+            }
+            return idCheckBoxes;
         }
     }
 }

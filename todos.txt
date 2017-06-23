@@ -1,0 +1,4 @@
+- Sidebar on the left
+- Clean up project
+- Change: Show grapes instead of count
+- Transfer the ViewModel to Controller

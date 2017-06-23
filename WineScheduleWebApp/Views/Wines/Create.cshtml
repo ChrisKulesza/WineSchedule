@@ -1,4 +1,4 @@
-@model WineScheduleWebApp.Models.Wine
+@model WineScheduleWebApp.Models.WineViewModels.CreateWineViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -11,59 +11,85 @@
         <h4>Wine</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        @*<div class="form-group">
-            @Html.LabelFor(model => model.ApplicationUserId, htmlAttributes: new { disabled = "disabled", @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.Editor("ApplicationUserId", new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.ApplicationUserId, "", new { @class = "text-danger" })
-            </div>
-        </div>*@
         <div class="form-group">
-            <label asp-for="Name" class="col-md-2 control-label"></label>
+            <label asp-for="Wine.Name" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <input asp-for="Wine.Name" class="form-control" />
+                <span asp-validation-for="Wine.Name" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="Year" class="col-md-2 control-label"></label>
+            @Html.Label("Appellation", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input asp-for="Year" class="form-control" />
-                <span asp-validation-for="Year" class="text-danger"></span>
+                <select asp-for="Wine.AppellationId" class="form-control" asp-items="ViewBag.Appellations"></select>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="Price" class="col-md-2 control-label"></label>
+            @Html.Label("Region", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
+                <select asp-for="Wine.RegionId" class="form-control" asp-items="ViewBag.Regions"></select>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="Rating" class="col-md-2 control-label"></label>
+            @Html.Label("Category", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input asp-for="Rating" class="form-control" />
-                <span asp-validation-for="Rating" class="text-danger"></span>
+                <select asp-for="Wine.CategoryId" class="form-control" asp-items="ViewBag.Categories"></select>
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="Stock" class="col-md-2 control-label"></label>
+            @Html.Label("Dryness", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <input asp-for="Stock" class="form-control" />
-                <span asp-validation-for="Stock" class="text-danger"></span>
+                <select asp-for="Wine.DrynessId" class="form-control" asp-items="ViewBag.Drynesses"></select>
             </div>
         </div>
         <div class="form-group">
-            @Html.Label("Regions", null, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.Label("Grapes", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <select asp-for="RegionId" class="form-control" asp-items="ViewBag.Regions"></select>
+                @for (var i = 0; i < Model.IdCheckBoxes.Count(); i++)
+                {
+                    <div>
+                        @Html.CheckBoxFor(viewModel => viewModel.IdCheckBoxes[i].IsSelected)
+                        <span>@Model.IdCheckBoxes[i].Name</span>
+                        @Html.HiddenFor(viewModel => viewModel.IdCheckBoxes[i].Id)
+                        @Html.HiddenFor(viewModel => viewModel.IdCheckBoxes[i].Name)
+                    </div>
+                }
+                @*<select asp="QuestionId" class="form-control" asp-items="@(new SelectList(@ViewBag.Questions, " QuestionId", "Content" ))"></select>*@
             </div>
         </div>
         <div class="form-group">
-            <label asp-for="Description" class="col-md-2 control-label"></label>
+            <label asp-for="Wine.Year" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
+                <input asp-for="Wine.Year" class="form-control" />
+                <span asp-validation-for="Wine.Year" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Wine.Price" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Wine.Price" class="form-control" />
+                <span asp-validation-for="Wine.Price" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Wine.Rating" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Wine.Rating" class="form-control" />
+                <span asp-validation-for="Wine.Rating" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Wine.Stock" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Wine.Stock" class="form-control" />
+                <span asp-validation-for="Wine.Stock" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Wine.Description" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Wine.Description" class="form-control" />
+                <span asp-validation-for="Wine.Description" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">

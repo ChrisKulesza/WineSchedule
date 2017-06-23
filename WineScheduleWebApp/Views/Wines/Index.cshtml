@@ -16,10 +16,16 @@
                 @Html.DisplayNameFor(model => model.Name)
             </th>
             <th>
-                @Html.DisplayNameFor(Model => model.Appellation)
+                @Html.DisplayNameFor(model => model.Appellation)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Region)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dryness)
             </th>
             <th>
                 @Html.DisplayName("Grapes")
@@ -49,10 +55,16 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Appellation)
+                @Html.DisplayFor(modelItem => item.Appellation.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Region)
+                @Html.DisplayFor(modelItem => item.Region.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Category.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dryness.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.WineGrapes.Count)
@@ -67,15 +79,14 @@
                 @Html.DisplayFor(modelItem => item.Rating)
             </td>
             <td>
-                @Html.ActionLink("+", "IncreaseStock", "Wines", new { id = item.Id }, new { @class = "btn btn-success" })
-                @Html.ActionLink("-", "DecreaseStock", "Wines", new { id = item.Id }, new { @class = "btn btn-danger" }) | 
                 @Html.DisplayFor(modelItem => item.Stock)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                
+                @Html.ActionLink("+", "IncreaseStock", "Wines", new { id = item.Id }, new { @class = "btn btn-success" })
+                @Html.ActionLink("-", "DecreaseStock", "Wines", new { id = item.Id }, new { @class = "btn btn-danger" })
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
