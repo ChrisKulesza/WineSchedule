@@ -1,4 +1,4 @@
-@model WineScheduleWebApp.Models.Appellation
+@model WineScheduleWebApp.Models.Dryness
 
 @{
     ViewData["Title"] = "Edit";
@@ -8,7 +8,7 @@
 
 <form asp-action="Edit">
     <div class="form-horizontal">
-        <h4>Appellation</h4>
+        <h4>Dryness</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="Id" />
@@ -20,9 +20,10 @@
             </div>
         </div>
         <div class="form-group">
-            @Html.Label("Region", null, htmlAttributes: new { @class = "control-label col-md-2" })
+            <label asp-for="Identifier" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <select asp-for="RegionId" class="form-control" asp-items="ViewBag.Regions"></select>
+                <input asp-for="Identifier" class="form-control" />
+                <span asp-validation-for="Identifier" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">

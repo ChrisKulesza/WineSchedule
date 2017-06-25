@@ -71,13 +71,15 @@
                 <span asp-validation-for="Wine.Price" class="text-danger"></span>
             </div>
         </div>
+
         <div class="form-group">
             <label asp-for="Wine.Rating" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="Wine.Rating" class="form-control" />
+                <input asp-for="Wine.Rating" class="form-control" value="0" min="0" max="10" type="range" />
                 <span asp-validation-for="Wine.Rating" class="text-danger"></span>
             </div>
         </div>
+
         <div class="form-group">
             <label asp-for="Wine.Stock" class="col-md-2 control-label"></label>
             <div class="col-md-10">

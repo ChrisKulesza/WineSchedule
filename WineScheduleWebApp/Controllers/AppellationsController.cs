@@ -22,7 +22,10 @@ namespace WineScheduleWebApp.Controllers.Api
         // GET: Appellations
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Appellation.ToListAsync());
+            var appellations = await _context.Appellation
+                .Include(a => a.Region)
+                .ToListAsync();
+            return View(appellations);
         }
 
         // GET: Appellations/Details/5
@@ -34,6 +37,7 @@ namespace WineScheduleWebApp.Controllers.Api
             }
 
             var appellation = await _context.Appellation
+                .Include(a => a.Region)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (appellation == null)
             {
@@ -46,6 +50,9 @@ namespace WineScheduleWebApp.Controllers.Api
         // GET: Appellations/Create
         public IActionResult Create()
         {
+            //var regions = new SelectList(_context.Region, "Id", "Name");
+            //regions.Items.
+            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", "");
             return View();
         }
 
@@ -62,6 +69,8 @@ namespace WineScheduleWebApp.Controllers.Api
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
+
+            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", appellation.RegionId);
             return View(appellation);
         }
 
@@ -73,11 +82,14 @@ namespace WineScheduleWebApp.Controllers.Api
                 return NotFound();
             }
 
-            var appellation = await _context.Appellation.SingleOrDefaultAsync(m => m.Id == id);
+            var appellation = await _context.Appellation
+                .Include(a => a.Region)
+                .SingleOrDefaultAsync(m => m.Id == id);
             if (appellation == null)
             {
                 return NotFound();
             }
+            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", appellation.RegionId);
             return View(appellation);
         }
 
@@ -113,6 +125,7 @@ namespace WineScheduleWebApp.Controllers.Api
                 }
                 return RedirectToAction("Index");
             }
+            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", appellation.RegionId);
             return View(appellation);
         }
 
