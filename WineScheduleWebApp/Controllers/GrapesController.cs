@@ -28,7 +28,11 @@ namespace WineScheduleWebApp.Controllers
         // GET: Grapes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Grape.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var grapes = await _context.Grape
+                .Where(g => g.ApplicationUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                .ToListAsync();
+            return View(grapes);
         }
 
         // GET: Grapes/Details/5
@@ -40,12 +44,18 @@ namespace WineScheduleWebApp.Controllers
             }
 
             var grape = await _context.Grape
+                .Include(g => g.ApplicationUser)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (grape == null)
             {
                 return NotFound();
             }
-
+            ViewBag.ApplicationUserName = await _context.ApplicationUser
+                .SingleOrDefaultAsync(a => a.Id == grape.ApplicationUserId);
+            ViewBag.WineGrapes = await _context.WineGrape
+                .Include(wg => wg.Wine)
+                .Where(wg => wg.GrapeId == grape.Id)
+                .ToListAsync();
             return View(grape);
         }
 
@@ -61,12 +71,14 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,ApplicationUserId,CreationDate,LastModifiedDate")] Grape grape)
+        public async Task<IActionResult> Create([Bind("Id,Name,ApplicationUserId")] Grape grape)
         {
             if (ModelState.IsValid)
             {
-                grape.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                grape.ApplicationUserId = userId;
                 _context.Add(grape);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }

@@ -7,22 +7,30 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WineScheduleWebApp.Data;
 using WineScheduleWebApp.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace WineScheduleWebApp.Controllers
 {
     public class DrynessesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public DrynessesController(ApplicationDbContext context)
+        public DrynessesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
-            _context = context;    
+            _context = context;
+            _userManager = userManager;
         }
 
         // GET: Drynesses
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Dryness.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var drynesses = await _context.Dryness
+                .Where(d => d.ApplicationUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                .ToListAsync();
+            return View(drynesses);
         }
 
         // GET: Drynesses/Details/5
@@ -39,7 +47,11 @@ namespace WineScheduleWebApp.Controllers
             {
                 return NotFound();
             }
-
+            ViewBag.ApplicationUserName = await _context.ApplicationUser
+                .SingleOrDefaultAsync(a => a.Id == dryness.ApplicationUserId);
+            ViewBag.Wines = await _context.Wine
+                .Where(w => w.DrynessId == id)
+                .ToListAsync();
             return View(dryness);
         }
 
@@ -54,10 +66,12 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Identifier")] Dryness dryness)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Dryness dryness)
         {
             if (ModelState.IsValid)
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                dryness.ApplicationUserId = userId;
                 _context.Add(dryness);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
@@ -86,7 +100,7 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Identifier")] Dryness dryness)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,ApplicationUserId")] Dryness dryness)
         {
             if (id != dryness.Id)
             {

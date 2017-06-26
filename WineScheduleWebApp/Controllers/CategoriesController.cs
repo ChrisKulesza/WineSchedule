@@ -7,22 +7,30 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WineScheduleWebApp.Data;
 using WineScheduleWebApp.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace WineScheduleWebApp.Controllers
 {
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public CategoriesController(ApplicationDbContext context)
+        public CategoriesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
-            _context = context;    
+            _context = context;
+            _userManager = userManager;
         }
 
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Category.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var categories = await _context.Category
+                .Where(c => c.ApplicationUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                .ToListAsync();
+            return View(categories);
         }
 
         // GET: Categories/Details/5
@@ -34,12 +42,17 @@ namespace WineScheduleWebApp.Controllers
             }
 
             var category = await _context.Category
+                .Include(c => c.ApplicationUser)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (category == null)
             {
                 return NotFound();
             }
-
+            ViewBag.ApplicationUserName = await _context.ApplicationUser
+                .SingleOrDefaultAsync(a => a.Id == category.ApplicationUserId);
+            ViewBag.Wines = await _context.Wine
+                .Where(w => w.CategoryId == id)
+                .ToListAsync();
             return View(category);
         }
 
@@ -54,10 +67,13 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Identifier")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
         {
+            
             if (ModelState.IsValid)
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                category.ApplicationUserId = userId;
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
@@ -86,7 +102,7 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,Identifier")] Category category)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,ApplicationUserId")] Category category)
         {
             if (id != category.Id)
             {

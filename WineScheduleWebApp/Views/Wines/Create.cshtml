@@ -11,11 +11,42 @@
         <h4>Wine</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Wine.ApplicationUserId" />
         <div class="form-group">
             <label asp-for="Wine.Name" class="col-md-2 control-label"></label>
             <div class="col-md-10">
                 <input asp-for="Wine.Name" class="form-control" />
                 <span asp-validation-for="Wine.Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Wine.Year" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Wine.Year" class="form-control" />
+                <span asp-validation-for="Wine.Year" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Wine.Price" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Wine.Price" class="form-control" />
+                <span asp-validation-for="Wine.Price" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Wine.Rating" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Wine.Rating" class="form-control" value="0" min="0" max="10" type="range" />
+                <span asp-validation-for="Wine.Rating" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Wine.Stock" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Wine.Stock" class="form-control" />
+                <span asp-validation-for="Wine.Stock" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">
@@ -54,37 +85,6 @@
                         @Html.HiddenFor(viewModel => viewModel.IdCheckBoxes[i].Name)
                     </div>
                 }
-                @*<select asp="QuestionId" class="form-control" asp-items="@(new SelectList(@ViewBag.Questions, " QuestionId", "Content" ))"></select>*@
-            </div>
-        </div>
-        <div class="form-group">
-            <label asp-for="Wine.Year" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input asp-for="Wine.Year" class="form-control" />
-                <span asp-validation-for="Wine.Year" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label asp-for="Wine.Price" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input asp-for="Wine.Price" class="form-control" />
-                <span asp-validation-for="Wine.Price" class="text-danger"></span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Wine.Rating" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input asp-for="Wine.Rating" class="form-control" value="0" min="0" max="10" type="range" />
-                <span asp-validation-for="Wine.Rating" class="text-danger"></span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Wine.Stock" class="col-md-2 control-label"></label>
-            <div class="col-md-10">
-                <input asp-for="Wine.Stock" class="form-control" />
-                <span asp-validation-for="Wine.Stock" class="text-danger"></span>
             </div>
         </div>
         <div class="form-group">

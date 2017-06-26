@@ -7,23 +7,29 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WineScheduleWebApp.Data;
 using WineScheduleWebApp.Models;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace WineScheduleWebApp.Controllers.Api
 {
     public class AppellationsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AppellationsController(ApplicationDbContext context)
+        public AppellationsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
-            _context = context;    
+            _context = context;
+            _userManager = userManager;
         }
 
         // GET: Appellations
         public async Task<IActionResult> Index()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var appellations = await _context.Appellation
                 .Include(a => a.Region)
+                .Where(a => a.ApplicationUserId == userId)
                 .ToListAsync();
             return View(appellations);
         }
@@ -38,22 +44,28 @@ namespace WineScheduleWebApp.Controllers.Api
 
             var appellation = await _context.Appellation
                 .Include(a => a.Region)
+                .Include(a => a.ApplicationUser)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (appellation == null)
             {
                 return NotFound();
             }
-
+            ViewBag.ApplicationUserName = await _context.ApplicationUser
+                .SingleOrDefaultAsync(a => a.Id == appellation.ApplicationUserId);
+            ViewBag.Wines = await _context.Wine
+                .Where(w => w.AppellationId == id)
+                .ToListAsync();
             return View(appellation);
         }
 
         // GET: Appellations/Create
         public IActionResult Create()
         {
-            //var regions = new SelectList(_context.Region, "Id", "Name");
-            //regions.Items.
-            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", "");
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var appellation = new Appellation() { ApplicationUserId = userId };
+            ViewBag.Regions = new SelectList(_context.Region
+                .Where(r => r.ApplicationUserId == userId), "Id", "Name");
+            return View(appellation);
         }
 
         // POST: Appellations/Create
@@ -61,7 +73,7 @@ namespace WineScheduleWebApp.Controllers.Api
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,ApplicationUserId,CreationDate,LastModifiedDate")] Appellation appellation)
+        public async Task<IActionResult> Create([Bind("Id,Name,RegionId,ApplicationUserId")] Appellation appellation)
         {
             if (ModelState.IsValid)
             {
@@ -70,7 +82,8 @@ namespace WineScheduleWebApp.Controllers.Api
                 return RedirectToAction("Index");
             }
 
-            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", appellation.RegionId);
+            ViewBag.Regions = new SelectList(_context.Region
+                .Where(r => r.ApplicationUserId == appellation.ApplicationUserId), "Id", "Name", appellation.RegionId);
             return View(appellation);
         }
 
@@ -89,7 +102,9 @@ namespace WineScheduleWebApp.Controllers.Api
             {
                 return NotFound();
             }
-            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", appellation.RegionId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Regions = new SelectList(_context.Region
+                .Where(r => r.ApplicationUserId == userId), "Id", "Name", appellation.RegionId);
             return View(appellation);
         }
 
@@ -98,7 +113,7 @@ namespace WineScheduleWebApp.Controllers.Api
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,ApplicationUserId,CreationDate,LastModifiedDate")] Appellation appellation)
+        public async Task<IActionResult> Edit(string id, [Bind("Id,Name,ApplicationUserId,RegionId")] Appellation appellation)
         {
             if (id != appellation.Id)
             {
@@ -125,7 +140,9 @@ namespace WineScheduleWebApp.Controllers.Api
                 }
                 return RedirectToAction("Index");
             }
-            ViewBag.Regions = new SelectList(_context.Region, "Id", "Name", appellation.RegionId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Regions = new SelectList(_context.Region
+                .Where(r => r.ApplicationUserId == userId), "Id", "Name", appellation.RegionId);
             return View(appellation);
         }
 

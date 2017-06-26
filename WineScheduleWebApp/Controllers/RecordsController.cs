@@ -28,8 +28,12 @@ namespace WineScheduleWebApp.Controllers
         // GET: Records
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Record.Include(r => r.Wine);
-            return View(await applicationDbContext.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var records = await _context.Record
+                .Include(r => r.Wine)
+                .Where(g => g.ApplicationUserId == userId)
+                .ToListAsync();
+            return View(records);
         }
 
         // GET: Records/Details/5
@@ -49,15 +53,15 @@ namespace WineScheduleWebApp.Controllers
             }
             ViewBag.ApplicationUserName = await _context.ApplicationUser
                 .SingleOrDefaultAsync(a => a.Id == record.ApplicationUserId);
-            ViewBag.WineName = await _context.Wine
-                .SingleOrDefaultAsync(w => w.Id == record.WineId);
             return View(record);
         }
 
         // GET: Records/Create
         public IActionResult Create()
         {
-            ViewBag.Wines = new SelectList(_context.Wine, "Id", "Name");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Wines = new SelectList(_context.Wine
+                .Where(r => r.ApplicationUserId == userId), "Id", "Name");
             return View();
         }
 
@@ -101,7 +105,9 @@ namespace WineScheduleWebApp.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            ViewBag.Wines = new SelectList(_context.Wine, "Id", "Name", record.WineId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Wines = new SelectList(_context.Wine
+                .Where(r => r.ApplicationUserId == userId), "Id", "Name", record.WineId);
             return View(record);
         }
 
@@ -118,7 +124,9 @@ namespace WineScheduleWebApp.Controllers
             {
                 return NotFound();
             }
-            ViewBag.Wines = new SelectList(_context.Wine, "Id", "Name", record.WineId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Wines = new SelectList(_context.Wine
+                .Where(r => r.ApplicationUserId == userId), "Id", "Name", record.WineId);
             return View(record);
         }
 
@@ -154,7 +162,9 @@ namespace WineScheduleWebApp.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            ViewBag.Wines = new SelectList(_context.Wine, "Id", "Name", record.WineId);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Wines = new SelectList(_context.Wine
+                .Where(w => w.ApplicationUserId == userId), "Id", "Name", record.WineId);
             return View(record);
         }
 

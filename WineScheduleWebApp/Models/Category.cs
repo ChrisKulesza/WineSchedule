@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WineScheduleWebApp.Models
 {
-    public class Category
+    public class Category : BaseModel
     {
         public Category()
         {

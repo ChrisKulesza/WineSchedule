@@ -28,7 +28,11 @@ namespace WineScheduleWebApp.Controllers
         // GET: Regions
         public async Task<IActionResult> Index()
         {
-           return View(await _context.Region.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var regions = await _context.Region
+                .Where(r => r.ApplicationUserId == userId)
+                .ToListAsync();
+           return View(regions);
         }
 
         // GET: Regions/Details/5
@@ -45,14 +49,20 @@ namespace WineScheduleWebApp.Controllers
             {
                 return NotFound();
             }
-
+            ViewBag.ApplicationUserName = await _context.ApplicationUser
+                .SingleOrDefaultAsync(a => a.Id == region.ApplicationUserId);
+            ViewBag.Wines = await _context.Wine
+                .Where(w => w.RegionId == id)
+                .ToListAsync();
+            ViewBag.Appellations = await _context.Appellation
+                .Where(a => a.RegionId == region.Id)
+                .ToListAsync();
             return View(region);
         }
 
         // GET: Regions/Create
         public IActionResult Create()
         {
-            ViewBag.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return View();
         }
 
@@ -61,10 +71,12 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,ApplicationUserId,CreationDate,LastModifiedDate")] Region region)
+        public async Task<IActionResult> Create([Bind("Id,Name")] Region region)
         {
             if (ModelState.IsValid)
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                region.ApplicationUserId = userId;
                 _context.Add(region);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");

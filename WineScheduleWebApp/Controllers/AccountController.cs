@@ -12,12 +12,14 @@ using Microsoft.Extensions.Options;
 using WineScheduleWebApp.Models;
 using WineScheduleWebApp.Models.AccountViewModels;
 using WineScheduleWebApp.Services;
+using WineScheduleWebApp.Data;
 
 namespace WineScheduleWebApp.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
@@ -26,6 +28,7 @@ namespace WineScheduleWebApp.Controllers
         private readonly string _externalCookieScheme;
 
         public AccountController(
+            ApplicationDbContext context,
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IOptions<IdentityCookieOptions> identityCookieOptions,
@@ -33,6 +36,7 @@ namespace WineScheduleWebApp.Controllers
             ISmsSender smsSender,
             ILoggerFactory loggerFactory)
         {
+            _context = context;
             _userManager = userManager;
             _signInManager = signInManager;
             _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
@@ -116,6 +120,7 @@ namespace WineScheduleWebApp.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
+                    CreateDefaultDatabaseEntries(user.Id);
                     // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=532713
                     // Send an email with this link
                     //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -451,6 +456,47 @@ namespace WineScheduleWebApp.Controllers
             return View();
         }
 
+        private async void CreateDefaultDatabaseEntries(string applicationUserId)
+        {
+            bool isSaved = false;
+            var appellation = new Appellation()
+            {
+                Id = "0",
+                ApplicationUserId = applicationUserId,
+                Name = " - "
+            };
+            var region = new Region()
+            {
+                Id = "0",
+                ApplicationUserId = applicationUserId,
+                Name = " - "
+            };
+            var grape = new Grape()
+            {
+                Id = "0",
+                ApplicationUserId = applicationUserId,
+                Name = " - "
+            };
+            var category = new Category()
+            {
+                Id = "0",
+                ApplicationUserId = applicationUserId,
+                Name = " - "
+            };
+            var dryness = new Dryness()
+            {
+                Id = "0",
+                ApplicationUserId = applicationUserId,
+                Name = " - "
+            };
+
+            _context.Add(appellation);
+            _context.Add(region);
+            _context.Add(grape);
+            _context.Add(category);
+            _context.Add(dryness);
+            await _context.SaveChangesAsync();
+        }
         
         #region Helpers
 
