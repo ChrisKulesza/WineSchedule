@@ -30,7 +30,8 @@ namespace WineScheduleWebApp.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var grapes = await _context.Grape
-                .Where(g => g.ApplicationUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                .Include(g => g.Category)
+                .Where(g => g.ApplicationUserId == userId)
                 .ToListAsync();
             return View(grapes);
         }
@@ -56,14 +57,20 @@ namespace WineScheduleWebApp.Controllers
                 .Include(wg => wg.Wine)
                 .Where(wg => wg.GrapeId == grape.Id)
                 .ToListAsync();
+            ViewBag.Categories = await _context.Category
+                .Where(c => c.ApplicationUserId == grape.ApplicationUserId)
+                .ToListAsync();
             return View(grape);
         }
 
         // GET: Grapes/Create
         public IActionResult Create()
         {
-            
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Categories = new SelectList(_context.Category
+                .Where(w => w.ApplicationUserId == userId), "Id", "Name", "0");
+            var grape = new Grape() { ApplicationUserId = userId };
+            return View(grape);
         }
 
         // POST: Grapes/Create
@@ -71,12 +78,10 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,ApplicationUserId")] Grape grape)
+        public async Task<IActionResult> Create([Bind("Id,Name,ApplicationUserId,CategoryId")] Grape grape)
         {
             if (ModelState.IsValid)
             {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                grape.ApplicationUserId = userId;
                 _context.Add(grape);
 
                 await _context.SaveChangesAsync();
@@ -98,6 +103,8 @@ namespace WineScheduleWebApp.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Categories = new SelectList(_context.Category
+                .Where(c => c.ApplicationUserId == grape.ApplicationUserId), "Id", "Name", grape.CategoryId);
             return View(grape);
         }
 
@@ -133,6 +140,8 @@ namespace WineScheduleWebApp.Controllers
                 }
                 return RedirectToAction("Index");
             }
+            ViewBag.Categories = new SelectList(_context.Category
+                .Where(c => c.ApplicationUserId == grape.ApplicationUserId), "Id", "Name", grape.CategoryId);
             return View(grape);
         }
 

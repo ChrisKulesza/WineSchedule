@@ -52,25 +52,33 @@
         <div class="form-group">
             @Html.Label("Appellation", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <select asp-for="Wine.AppellationId" class="form-control" asp-items="ViewBag.Appellations"></select>
+                <select asp-for="Wine.AppellationId" class="form-control" asp-items="ViewBag.Appellations">
+                    <option value="">--- SELECT ---</option>
+                </select>
             </div>
         </div>
         <div class="form-group">
             @Html.Label("Region", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <select asp-for="Wine.RegionId" class="form-control" asp-items="ViewBag.Regions"></select>
+                <select asp-for="Wine.RegionId" class="form-control" asp-items="ViewBag.Regions">
+                    <option value="">--- SELECT ---</option>
+                </select>
             </div>
         </div>
         <div class="form-group">
             @Html.Label("Category", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <select asp-for="Wine.CategoryId" class="form-control" asp-items="ViewBag.Categories"></select>
+                <select asp-for="Wine.CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                    <option value="">--- SELECT ---</option>
+                </select>
             </div>
         </div>
         <div class="form-group">
             @Html.Label("Dryness", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <select asp-for="Wine.DrynessId" class="form-control" asp-items="ViewBag.Drynesses"></select>
+                <select asp-for="Wine.DrynessId" class="form-control" asp-items="ViewBag.Drynesses">
+                    <option value="">--- SELECT ---</option>
+                </select>
             </div>
         </div>
         <div class="form-group">

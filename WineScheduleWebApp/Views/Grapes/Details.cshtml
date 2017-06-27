@@ -35,6 +35,12 @@
             @Html.DisplayFor(model => model.LastModifiedDate)
         </dd>
         <dt>
+            @Html.DisplayNameFor(model => model.Category)
+        </dt>
+        <dd>
+            @Model.Category.Name
+        </dd>
+        <dt>
             @Html.DisplayName("Assigned wines")
         </dt>
         <dd>

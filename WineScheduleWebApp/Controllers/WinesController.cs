@@ -75,13 +75,13 @@ namespace WineScheduleWebApp.Controllers
             // Lists to choose
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             ViewBag.Appellations = new SelectList(_context.Appellation
-                .Where(w => w.ApplicationUserId == userId), "Id", "Name", "0");
+                .Where(w => w.ApplicationUserId == userId), "Id", "Name");
             ViewBag.Regions = new SelectList(_context.Region
-                .Where(w => w.ApplicationUserId == userId), "Id", "Name", "0");
+                .Where(w => w.ApplicationUserId == userId), "Id", "Name");
             ViewBag.Drynesses = new SelectList(_context.Dryness
-                .Where(w => w.ApplicationUserId == userId), "Id", "Name", "0");
+                .Where(w => w.ApplicationUserId == userId), "Id", "Name");
             ViewBag.Categories = new SelectList(_context.Category
-                .Where(w => w.ApplicationUserId == userId), "Id", "Name", "0");
+                .Where(w => w.ApplicationUserId == userId), "Id", "Name");
 
             // Fill in the view model
             var grapes = await _context.Grape
@@ -251,13 +251,13 @@ namespace WineScheduleWebApp.Controllers
             {
                 return NotFound();
             }
-            var editWineViewModel = new EditWineViewModel();
-            editWineViewModel.Wine = wine;
             var grapes = _context.Grape.ToList();
-            var wineGrapes = _context.WineGrape.Where(wg => wg.GrapeId == wine.Id).ToList();
-            editWineViewModel.IdCheckBoxes = GetEditCheckBoxes(grapes, wineGrapes);
-
-
+            var wineGrapes = _context.WineGrape.Where(wg => wg.WineId == wine.Id).ToList();
+            var editWineViewModel = new EditWineViewModel() {
+                Wine = wine,
+                IdCheckBoxes = GetEditCheckBoxes(grapes, wineGrapes)
+            };
+              
             // Data to list
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             ViewBag.Appellations = new SelectList(_context.Appellation
@@ -367,13 +367,14 @@ namespace WineScheduleWebApp.Controllers
             {
                 for (int j = 0; j < wineGrapes.Count(); j++)
                 {
-                    if (grapes[i].Id == wineGrapes[i].GrapeId)
+                    if (grapes[i].Id == wineGrapes[j].GrapeId)
                     {
                         isSelected = true;
                         break;
                     }
                 }
                 idCheckBoxes.Add(new IdCheckBox() { Id = grapes[i].Id, Name = grapes[i].Name, IsSelected = isSelected });
+                isSelected = false;
             }
             return idCheckBoxes;
         }

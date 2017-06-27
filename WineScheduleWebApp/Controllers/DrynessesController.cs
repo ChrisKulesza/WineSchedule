@@ -28,7 +28,7 @@ namespace WineScheduleWebApp.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var drynesses = await _context.Dryness
-                .Where(d => d.ApplicationUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                .Where(d => d.ApplicationUserId == userId)
                 .ToListAsync();
             return View(drynesses);
         }

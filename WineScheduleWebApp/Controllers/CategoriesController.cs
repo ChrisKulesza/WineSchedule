@@ -28,7 +28,7 @@ namespace WineScheduleWebApp.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var categories = await _context.Category
-                .Where(c => c.ApplicationUserId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                .Where(c => c.ApplicationUserId == userId)
                 .ToListAsync();
             return View(categories);
         }
