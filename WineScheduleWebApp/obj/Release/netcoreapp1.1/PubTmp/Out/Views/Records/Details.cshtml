@@ -23,10 +23,10 @@
             @Html.DisplayFor(model => model.Quantity)
         </dd>
         <dt>
-            @Html.DisplayName("User")
+            @Html.DisplayName("Created by")
         </dt>
         <dd>
-            @ViewBag.ApplicationUserName
+            @Html.DisplayFor(model => model.ApplicationUser.UserName)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.CreationDate)
@@ -44,7 +44,7 @@
             @Html.DisplayName("Wine")
         </dt>
         <dd>
-            @ViewBag.WineName
+            @Model.Wine.Name
         </dd>
     </dl>
 </div>

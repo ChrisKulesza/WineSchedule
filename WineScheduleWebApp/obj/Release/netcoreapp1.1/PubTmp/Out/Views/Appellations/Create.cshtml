@@ -11,6 +11,7 @@
         <h4>Appellation</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="ApplicationUserId" />
         <div class="form-group">
             <label asp-for="Name" class="col-md-2 control-label"></label>
             <div class="col-md-10">
@@ -21,7 +22,9 @@
         <div class="form-group">
             @Html.Label("Region", null, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                <select asp-for="RegionId" class="form-control" asp-items="ViewBag.Regions"></select>
+                <select asp-for="RegionId" class="form-control" asp-items="ViewBag.Regions">
+                    <option value="">--- SELECT ---</option>
+                </select>
             </div>
         </div>
 

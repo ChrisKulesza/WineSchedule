@@ -22,7 +22,7 @@
         <div class="form-group">
             <label asp-for="Wine.Year" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="Wine.Year" class="form-control" />
+                <input asp-for="Wine.Year" class="form-control" value=@DateTime.Now.Year min=1950 max=@DateTime.Now.Year type="range" />
                 <span asp-validation-for="Wine.Year" class="text-danger"></span>
             </div>
         </div>

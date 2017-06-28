@@ -23,10 +23,10 @@
             @Html.DisplayFor(model => model.Region.Name)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.ApplicationUserId)
+            @Html.DisplayName("Created by")
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ApplicationUserId)
+            @Html.DisplayFor(model => model.ApplicationUser.UserName)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.CreationDate)

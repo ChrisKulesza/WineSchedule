@@ -286,16 +286,78 @@ namespace WineScheduleWebApp.Controllers
             if (ModelState.IsValid)
             {
                 Wine wine = viewModel.Wine;
-                // Add each Wine to Grape relationship to the database
-                List<IdCheckBox> idCheckBoxes = viewModel.IdCheckBoxes;
-                foreach (var idCheckBox in idCheckBoxes)
+                // TODO: Testing list comparison
+                List<string> databaseGrapeIds = _context.WineGrape
+                    .Where(wg => wg.WineId == wine.Id)
+                    .Select(wg => wg.GrapeId)
+                    .ToList();
+                List<string> selectedGrapeIds = viewModel.IdCheckBoxes
+                    .Where(cb => cb.IsSelected == true)
+                    .Select(cb => cb.Id)
+                    .ToList();
+
+                // Except the lists to determine the WineGrapes which must be removed
+                var exceptRemoveGrapeIds = Enumerable.Except(databaseGrapeIds, selectedGrapeIds); //{1,2,3} intersect {3,4,5} = {1,2}
+                // Delete all WineGrapes which are in the DB but not ticked in the edit view
+                foreach (var exceptGrapeId in exceptRemoveGrapeIds)
                 {
-                    if(idCheckBox.IsSelected)
-                    {
-                        WineGrape wineGrape = new WineGrape() { WineId = wine.Id, GrapeId = idCheckBox.Id };
-                        _context.Add(wineGrape);
-                    }
+                    var wineGrape = await _context.WineGrape
+                        .SingleOrDefaultAsync(wg => wg.WineId == wine.Id && wg.GrapeId == exceptGrapeId);
+                    if(wineGrape != null) _context.WineGrape.Remove(wineGrape);
                 }
+                // Intersect the lists to determine the WineGrapes which must be added
+                var exceptAddGrapeIds = Enumerable.Except(selectedGrapeIds, databaseGrapeIds); //{3,4,5} intersect {1,2,3} = {3,4} 
+                foreach (var exceptGrapeId in exceptAddGrapeIds)
+                {
+                    _context.WineGrape.Add(new WineGrape()
+                    {
+                        WineId = wine.Id,
+                        GrapeId = exceptGrapeId
+                    });
+                }
+                //var unionGrapeIds = Enumerable.Union(selectedGrapeIds, intersectGrapeIds);
+                ////foreach
+                //var list1 = new List<string>() { "123", "456", "789" };
+                //var list2 = new List<string>() { "123", "463", "938", "298" };
+                //var test1 = Enumerable.SequenceEqual(list1, list2);
+                //var test2 = Enumerable.Union(list1, list2);
+                //var test3 = Enumerable.Concat(list1, list2);
+                //var test4 = Enumerable.Intersect(list1, list2);
+                //var test3 = Enumerable.Zip(selectedGrapeIds, grapeIds, ((list1, list2, list3) =>
+
+                // Intersect -> delete all others from list1
+                // list2 union intersect result
+
+                //Wine wine = viewModel.Wine;
+                //// Get the selected grapes (idCheckBoxes) from the ViewModel
+                //List<IdCheckBox> idCheckBoxes = viewModel.IdCheckBoxes;
+                //// Get the previous selected grapes from the database
+                //List<WineGrape> wineGrapes = _context
+                //    .WineGrape.Where(wg => wg.WineId == wine.Id)
+                //    .ToList();
+                //Add each Wine to Grape relationship to the db
+                //foreach (var idCheckBox in idCheckBoxes)
+                //{
+                //    if(idCheckBox.IsSelected)
+                //    {
+                //        // Check if the selected grape is already in the database
+                //        bool isFound = false;
+                //        foreach (var wineGrape in wineGrapes)
+                //        {
+                //            if(wineGrape.GrapeId == idCheckBox.Id)
+                //            {
+                //                isFound = true;
+                //                break;
+                //            }
+                //        }
+                //        // Add to the database if the grape wine relationship doesn't exist in the db
+                //        if(!isFound)
+                //        {
+                //            var wineGrape = new WineGrape() { WineId = wine.Id, GrapeId = idCheckBox.Id };
+                //            _context.Add(wineGrape);
+                //        }
+                //    }
+                //}
                 try
                 {
                     _context.Update(wine);

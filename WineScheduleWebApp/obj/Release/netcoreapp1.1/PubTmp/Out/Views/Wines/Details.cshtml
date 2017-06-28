@@ -53,10 +53,10 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.ApplicationUserId)
+            @Html.DisplayName("Created by")
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.ApplicationUserId)
+            @Html.DisplayFor(model => model.ApplicationUser.UserName)
         </dd>
         <dt>
             @Html.DisplayNameFor(model => model.CreationDate)
@@ -71,10 +71,37 @@
             @Html.DisplayFor(model => model.LastModifiedDate)
         </dd>
         <dt>
-            @Html.DisplayName("Region")
+            @Html.DisplayNameFor(model => model.Category)
         </dt>
         <dd>
-            @ViewBag.RegionName
+            @Model.Category.Name
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Region)
+        </dt>
+        <dd>
+            @Model.Region.Name
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Appellation)
+        </dt>
+        <dd>
+            @Model.Appellation.Name
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Dryness)
+        </dt>
+        <dd>
+            @Model.Dryness.Name
+        </dd>
+        <dt>
+            @Html.DisplayName("Grapes")
+        </dt>
+        <dd>
+            @foreach (var wineGrape in ViewBag.WineGrapes)
+            {
+                <div>@wineGrape.Grape.Name</div>
+            }
         </dd>
     </dl>
 </div>

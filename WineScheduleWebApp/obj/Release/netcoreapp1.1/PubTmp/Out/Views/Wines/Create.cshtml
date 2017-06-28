@@ -11,6 +11,7 @@
         <h4>Wine</h4>
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Wine.ApplicationUserId" />
         <div class="form-group">
             <label asp-for="Wine.Name" class="col-md-2 control-label"></label>
             <div class="col-md-10">
@@ -19,48 +20,9 @@
             </div>
         </div>
         <div class="form-group">
-            @Html.Label("Appellation", null, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <select asp-for="Wine.AppellationId" class="form-control" asp-items="ViewBag.Appellations"></select>
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.Label("Region", null, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <select asp-for="Wine.RegionId" class="form-control" asp-items="ViewBag.Regions"></select>
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.Label("Category", null, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <select asp-for="Wine.CategoryId" class="form-control" asp-items="ViewBag.Categories"></select>
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.Label("Dryness", null, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                <select asp-for="Wine.DrynessId" class="form-control" asp-items="ViewBag.Drynesses"></select>
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.Label("Grapes", null, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @for (var i = 0; i < Model.IdCheckBoxes.Count(); i++)
-                {
-                    <div>
-                        @Html.CheckBoxFor(viewModel => viewModel.IdCheckBoxes[i].IsSelected)
-                        <span>@Model.IdCheckBoxes[i].Name</span>
-                        @Html.HiddenFor(viewModel => viewModel.IdCheckBoxes[i].Id)
-                        @Html.HiddenFor(viewModel => viewModel.IdCheckBoxes[i].Name)
-                    </div>
-                }
-                @*<select asp="QuestionId" class="form-control" asp-items="@(new SelectList(@ViewBag.Questions, " QuestionId", "Content" ))"></select>*@
-            </div>
-        </div>
-        <div class="form-group">
             <label asp-for="Wine.Year" class="col-md-2 control-label"></label>
             <div class="col-md-10">
-                <input asp-for="Wine.Year" class="form-control" />
+                <input asp-for="Wine.Year" class="form-control" value=@DateTime.Now.Year min=1950 max=@DateTime.Now.Year type="range" />
                 <span asp-validation-for="Wine.Year" class="text-danger"></span>
             </div>
         </div>
@@ -85,6 +47,52 @@
             <div class="col-md-10">
                 <input asp-for="Wine.Stock" class="form-control" />
                 <span asp-validation-for="Wine.Stock" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label("Appellation", null, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select asp-for="Wine.AppellationId" class="form-control" asp-items="ViewBag.Appellations">
+                    <option value="">--- SELECT ---</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label("Region", null, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select asp-for="Wine.RegionId" class="form-control" asp-items="ViewBag.Regions">
+                    <option value="">--- SELECT ---</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label("Category", null, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select asp-for="Wine.CategoryId" class="form-control" asp-items="ViewBag.Categories">
+                    <option value="">--- SELECT ---</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label("Dryness", null, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select asp-for="Wine.DrynessId" class="form-control" asp-items="ViewBag.Drynesses">
+                    <option value="">--- SELECT ---</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label("Grapes", null, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @for (var i = 0; i < Model.IdCheckBoxes.Count(); i++)
+                {
+                    <div>
+                        @Html.CheckBoxFor(viewModel => viewModel.IdCheckBoxes[i].IsSelected)
+                        <span>@Model.IdCheckBoxes[i].Name</span>
+                        @Html.HiddenFor(viewModel => viewModel.IdCheckBoxes[i].Id)
+                        @Html.HiddenFor(viewModel => viewModel.IdCheckBoxes[i].Name)
+                    </div>
+                }
             </div>
         </div>
         <div class="form-group">
