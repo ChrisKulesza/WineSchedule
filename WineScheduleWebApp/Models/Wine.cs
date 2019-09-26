@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
+using WineScheduleWebApp.Models.WineViewModels;
 
 namespace WineScheduleWebApp.Models
 {
@@ -10,14 +12,21 @@ namespace WineScheduleWebApp.Models
     {
         public Wine()
         {
-            WineGrapes = new HashSet<WineGrape>();
+            WineGrapes = new List<WineGrape>();
         }
-        public string RegionId { get; set; }
-        public virtual Region Region { get; set; }
+        // Primary Key
+        public string Id { get; set; }
+        // Foreign Keys
         public string AppellationId { get; set; }
         public virtual Appellation Appellation { get; set; }
-        public string Id { get; set; }
-        public ICollection<WineGrape> WineGrapes { get; set; }
+        public string RegionId { get; set; }
+        public virtual Region Region { get; set; }
+        public string DrynessId { get; set; }
+        public virtual Dryness Dryness { get; set; }
+        public string CategoryId { get; set; }
+        public virtual Category Category { get; set; }
+        public List<WineGrape> WineGrapes { get; set; }
+        // Attributes
         [Required]
         public string Name { get; set; }
         public short Year { get; set; }

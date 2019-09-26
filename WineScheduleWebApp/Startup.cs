@@ -65,6 +65,12 @@ namespace WineScheduleWebApp
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
+
+                using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                {
+                    serviceScope.ServiceProvider.GetService<ApplicationDbContext>().Database.Migrate();
+                    //serviceScope.ServiceProvider.GetService<ApplicationDbContext>().CreateDefaultData();
+                }
             }
             else
             {

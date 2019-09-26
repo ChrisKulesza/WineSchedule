@@ -10,6 +10,9 @@ namespace WineScheduleWebApp.Models
     {
         public string Id { get; set; }
         [Required]
+
         public string Name { get; set; }
+        public string RegionId { get; set; }
+        public virtual Region Region { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace WineScheduleWebApp.Models
     public class BaseModel
     {
         public string ApplicationUserId { get; set; }
+        public virtual ApplicationUser ApplicationUser { get; set; }
         public DateTime CreationDate { get; set; } = DateTime.Now;
         public DateTime LastModifiedDate { get; set; }
         public void MarkUpdate()

@@ -33,5 +33,7 @@ namespace WineScheduleWebApp.Data
         public DbSet<WineScheduleWebApp.Models.Wine> Wine { get; set; }
         public DbSet<WineScheduleWebApp.Models.WineGrape> WineGrape { get; set; }
         public DbSet<WineScheduleWebApp.Models.Appellation> Appellation { get; set; }
+        public DbSet<WineScheduleWebApp.Models.Category> Category { get; set; }
+        public DbSet<WineScheduleWebApp.Models.Dryness> Dryness { get; set; }
     }
 }

@@ -11,5 +11,7 @@ namespace WineScheduleWebApp.Models
         public string GrapeId { get; set; }
         public virtual Wine Wine { get; set; }
         public virtual Grape Grape { get; set; }
+
+        public bool IsSelected { get; set; }
     }
 }

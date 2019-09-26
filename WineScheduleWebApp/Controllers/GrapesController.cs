@@ -28,7 +28,12 @@ namespace WineScheduleWebApp.Controllers
         // GET: Grapes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Grape.ToListAsync());
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var grapes = await _context.Grape
+                .Include(g => g.Category)
+                .Where(g => g.ApplicationUserId == userId)
+                .ToListAsync();
+            return View(grapes);
         }
 
         // GET: Grapes/Details/5
@@ -40,20 +45,32 @@ namespace WineScheduleWebApp.Controllers
             }
 
             var grape = await _context.Grape
+                .Include(g => g.ApplicationUser)
                 .SingleOrDefaultAsync(m => m.Id == id);
             if (grape == null)
             {
                 return NotFound();
             }
-
+            ViewBag.ApplicationUserName = await _context.ApplicationUser
+                .SingleOrDefaultAsync(a => a.Id == grape.ApplicationUserId);
+            ViewBag.WineGrapes = await _context.WineGrape
+                .Include(wg => wg.Wine)
+                .Where(wg => wg.GrapeId == grape.Id)
+                .ToListAsync();
+            ViewBag.Categories = await _context.Category
+                .Where(c => c.ApplicationUserId == grape.ApplicationUserId)
+                .ToListAsync();
             return View(grape);
         }
 
         // GET: Grapes/Create
         public IActionResult Create()
         {
-            
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Categories = new SelectList(_context.Category
+                .Where(w => w.ApplicationUserId == userId), "Id", "Name", "0");
+            var grape = new Grape() { ApplicationUserId = userId };
+            return View(grape);
         }
 
         // POST: Grapes/Create
@@ -61,12 +78,12 @@ namespace WineScheduleWebApp.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,ApplicationUserId,CreationDate,LastModifiedDate")] Grape grape)
+        public async Task<IActionResult> Create([Bind("Id,Name,ApplicationUserId,CategoryId")] Grape grape)
         {
             if (ModelState.IsValid)
             {
-                grape.ApplicationUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 _context.Add(grape);
+
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
@@ -86,6 +103,8 @@ namespace WineScheduleWebApp.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Categories = new SelectList(_context.Category
+                .Where(c => c.ApplicationUserId == grape.ApplicationUserId), "Id", "Name", grape.CategoryId);
             return View(grape);
         }
 
@@ -121,6 +140,8 @@ namespace WineScheduleWebApp.Controllers
                 }
                 return RedirectToAction("Index");
             }
+            ViewBag.Categories = new SelectList(_context.Category
+                .Where(c => c.ApplicationUserId == grape.ApplicationUserId), "Id", "Name", grape.CategoryId);
             return View(grape);
         }
 
